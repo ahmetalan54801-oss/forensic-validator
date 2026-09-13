@@ -6,6 +6,11 @@
 <title>forensic-validator — Adli Araç ve Yöntem Doğrulama</title>
 <meta name="description" content="dd ve dc3dd gibi adli imaging araçlarını NIST CFTT tarzı test senaryolarıyla doğrulayan, bütünlük kontrolü ve chain-of-custody defteri sunan açık kaynak Python CLI aracı.">
 <meta name="google-site-verification" content="Yo8HUWXVXLl2ndXUgPOQ7Sm_N42qD9nmEhmlGwjL_OE" />
+<meta property="og:title" content="forensic-validator — Adli Araç ve Yöntem Doğrulama">
+<meta property="og:description" content="dd ve dc3dd gibi adli imaging araçlarını NIST CFTT tarzı test senaryolarıyla doğrulayan, bütünlük kontrolü ve chain-of-custody defteri sunan açık kaynak Python CLI aracı.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ahmetalan54801-oss.github.io/forensic-validator/">
+<meta name="twitter:card" content="summary">
 <style>
   :root {
     --bg: #f7f7f5;
@@ -142,6 +147,17 @@
       </div>
     </header>
 
+    <h2>Neden bu proje?</h2>
+    <p>
+      Adli bilişim incelemelerinde kullanılan araçların (imaging, hash doğrulama,
+      carving vb.) doğru sonuç ürettiğini kanıtlamak, mahkemede kabul edilebilir
+      bir sürecin temelidir. NIST'in <strong>Computer Forensics Tool Testing (CFTT)</strong>
+      programı bu doğrulamayı endüstri çapında standartlaştırırken, bu proje aynı
+      mantığı küçük ölçekte, öğrenme amaçlı olarak uygulamayı hedefliyor: bilinen
+      bir girdiyle bir aracı çalıştır, çıktının beklenenle eşleştiğini kanıtla,
+      sonucu kurcalamaya karşı korumalı şekilde kaydet.
+    </p>
+
     <h2>Ne yapar?</h2>
     <div class="cards">
       <div class="card">
@@ -179,6 +195,43 @@ python3 -m venv .venv
 .venv/bin/pip install -e .
 
 .venv/bin/forensic-validator testsuite run examples/dd_suite.yaml</code></pre>
+
+    <h2>Kullanım örnekleri</h2>
+    <p>Dosya bütünlüğü doğrulama:</p>
+    <pre><code>forensic-validator hash compute dosya.img --algo sha256
+forensic-validator hash compare orijinal.img kopya.img
+forensic-validator hash verify dosya.img &lt;beklenen_hash&gt;</code></pre>
+
+    <p>Sonucu chain-of-custody defterine kaydederek test suite çalıştırma:</p>
+    <pre><code>forensic-validator testsuite run examples/dc3dd_suite.yaml \
+  --ledger case001.jsonl --actor "ahmet"</code></pre>
+
+    <p>Defteri görüntüleme ve kurcalanmadığını doğrulama:</p>
+    <pre><code>forensic-validator ledger show --file case001.jsonl
+forensic-validator ledger verify --file case001.jsonl</code></pre>
+
+    <h2>SSS</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>dd ile dc3dd arasındaki fark ne?</h3>
+        <p>dc3dd, dd'nin standart <code>bs=</code>/<code>count=</code>/<code>skip=</code>
+        parametreleri yerine kendi sözdizimini (<code>ssz=</code>, <code>cnt=</code>,
+        <code>iskip=</code>, <code>bufsz=</code>) kullanır ve dahili hash hesaplama/loglama
+        özelliği sunar — bu fark, proje geliştirilirken gerçek testlerle keşfedildi.</p>
+      </div>
+      <div class="card">
+        <h3>Ledger neden güvenli kabul ediliyor?</h3>
+        <p>Her kayıt bir öncekinin sha256 hash'ini içerir; bu zincirden herhangi bir
+        kayıt sonradan değiştirilirse <code>ledger verify</code> komutu zinciri
+        yeniden hesaplayıp tutarsızlığı tespit eder.</p>
+      </div>
+      <div class="card">
+        <h3>Gerçek adli vakalarda kullanılabilir mi?</h3>
+        <p>Hayır — bu bir öğrenme projesidir. Gerçek vakalar için NIST CFTT
+        metodolojisi, ilgili mevzuat ve ISO/IEC 17025 gibi akreditasyon
+        gereksinimleri esas alınmalıdır.</p>
+      </div>
+    </div>
 
     <h2>Örnek çıktı</h2>
     <pre><code># Test Raporu: examples/dc3dd_suite.yaml
