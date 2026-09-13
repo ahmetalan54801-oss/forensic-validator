@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>forensic-validator — Adli Araç ve Yöntem Doğrulama</title>
+<meta name="description" content="dd ve dc3dd gibi adli imaging araçlarını NIST CFTT tarzı test senaryolarıyla doğrulayan, bütünlük kontrolü ve chain-of-custody defteri sunan açık kaynak Python CLI aracı.">
+<style>
+  :root {
+    --bg: #f7f7f5;
+    --panel: #ffffff;
+    --text: #1a1a1a;
+    --muted: #5f5f5f;
+    --border: #e2e2df;
+    --accent: #1f6f4a;
+    --accent-bg: #eaf5ef;
+    --code-bg: #1e1e1e;
+    --code-text: #e8e8e8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161a;
+      --panel: #1b1e23;
+      --text: #eaeaea;
+      --muted: #a3a3a3;
+      --border: #2b2f36;
+      --accent: #4fbf8b;
+      --accent-bg: #17281f;
+      --code-bg: #0f1113;
+      --code-text: #e8e8e8;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 48px 20px 80px; }
+  header { text-align: center; margin-bottom: 40px; }
+  h1 { font-size: 2rem; margin: 0 0 8px; letter-spacing: -0.02em; }
+  .tagline { color: var(--muted); font-size: 1.05rem; margin: 0 0 20px; }
+  .badges { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 24px; }
+  .badges img { height: 20px; }
+  .cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-secondary { background: var(--panel); color: var(--text); border: 1px solid var(--border); }
+
+  h2 { font-size: 1.3rem; margin: 48px 0 16px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+  }
+  .card h3 { margin: 0 0 8px; font-size: 1rem; }
+  .card p { margin: 0; color: var(--muted); font-size: 0.92rem; }
+  .card .icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: var(--accent-bg);
+    color: var(--accent);
+    font-size: 1rem;
+    margin-bottom: 10px;
+  }
+
+  pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 16px 18px;
+    border-radius: 10px;
+    overflow-x: auto;
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+  code { font-family: "SF Mono", Menlo, Consolas, monospace; }
+  p code, li code {
+    background: var(--accent-bg);
+    color: var(--accent);
+    padding: 1px 6px;
+    border-radius: 5px;
+    font-size: 0.88em;
+  }
+
+  .flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 20px 0;
+    font-size: 0.88rem;
+  }
+  .flow .node {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    white-space: nowrap;
+  }
+  .flow .arrow { color: var(--muted); }
+
+  footer {
+    margin-top: 60px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.85rem;
+    text-align: center;
+  }
+  footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>forensic-validator</h1>
+      <p class="tagline">Adli bilişim araç ve yöntemlerini doğrulamak için açık kaynak bir CLI aracı</p>
+      <div class="badges">
+        <img src="https://github.com/ahmetalan54801-oss/forensic-validator/actions/workflows/tests.yml/badge.svg" alt="tests">
+        <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="MIT License">
+        <img src="https://img.shields.io/badge/python-3.11%2B-blue.svg" alt="Python 3.11+">
+      </div>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="https://github.com/ahmetalan54801-oss/forensic-validator">GitHub'da görüntüle</a>
+        <a class="btn btn-secondary" href="#baslangic">Hızlı başlangıç</a>
+      </div>
+    </header>
+
+    <h2>Ne yapar?</h2>
+    <div class="cards">
+      <div class="card">
+        <div class="icon">#</div>
+        <h3>Bütünlük doğrulama</h3>
+        <p>Dosya ve disk imajları için MD5/SHA-1/SHA-256/SHA-512 hesaplama, karşılaştırma ve doğrulama.</p>
+      </div>
+      <div class="card">
+        <div class="icon">✓</div>
+        <h3>Araç test framework'ü</h3>
+        <p>NIST CFTT mantığıyla, dd/dc3dd gibi adli araçları bilinen girdilerle çalıştırıp beklenen sonuçla karşılaştırır.</p>
+      </div>
+      <div class="card">
+        <div class="icon">≡</div>
+        <h3>Chain-of-custody defteri</h3>
+        <p>Hash zincirli, kurcalamayı otomatik tespit eden append-only bir zincir-i emanet kaydı.</p>
+      </div>
+    </div>
+
+    <h2>Nasıl çalışır?</h2>
+    <div class="flow">
+      <div class="node">dd / dc3dd</div>
+      <div class="arrow">→</div>
+      <div class="node">testsuite run</div>
+      <div class="arrow">→</div>
+      <div class="node">hash doğrulama</div>
+      <div class="arrow">→</div>
+      <div class="node">ledger (opsiyonel)</div>
+    </div>
+
+    <h2 id="baslangic">Hızlı başlangıç</h2>
+    <pre><code>git clone https://github.com/ahmetalan54801-oss/forensic-validator
+cd forensic-validator
+python3 -m venv .venv
+.venv/bin/pip install -e .
+
+.venv/bin/forensic-validator testsuite run examples/dd_suite.yaml</code></pre>
+
+    <h2>Örnek çıktı</h2>
+    <pre><code># Test Raporu: examples/dc3dd_suite.yaml
+
+**Sonuç: 6/6 test başarılı**
+
+## [PASS] dc3dd bit-bit imaj alırken kaynak dosyayla aynı hash'i üretir
+- exit_code: 0
+...</code></pre>
+
+    <footer>
+      MIT Lisansı · <a href="https://github.com/ahmetalan54801-oss/forensic-validator">github.com/ahmetalan54801-oss/forensic-validator</a> · Ahmet Alan tarafından, öğrenme amaçlı geliştirildi
+    </footer>
+  </div>
+</body>
+</html>
