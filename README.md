@@ -1,9 +1,8 @@
 # forensic-validator
 
+![tests](https://github.com/ahmetalan54801-oss/forensic-validator/actions/workflows/tests.yml/badge.svg)
 ![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue.svg)
-![dd suite](https://img.shields.io/badge/dd%20suite-6%2F6%20passing-brightgreen.svg)
-![dc3dd suite](https://img.shields.io/badge/dc3dd%20suite-6%2F6%20passing-brightgreen.svg)
 
 Adli bilişim araç ve yöntemlerini doğrulamak için basit bir CLI aracı (öğrenme projesi).
 

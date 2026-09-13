@@ -1,0 +1,32 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  testsuites:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: dc3dd kur
+        run: sudo apt-get update && sudo apt-get install -y dc3dd
+
+      - name: Paketi kur
+        run: pip install -e .
+
+      - name: dd suite'ini çalıştır
+        run: forensic-validator testsuite run examples/dd_suite.yaml
+
+      - name: dc3dd suite'ini çalıştır
+        run: forensic-validator testsuite run examples/dc3dd_suite.yaml
+
+      - name: ledger doğrulaması
+        run: |
+          forensic-validator ledger add --file /tmp/ci_ledger.jsonl --actor "ci" --action "ci testi" --details "github actions"
+          forensic-validator ledger verify --file /tmp/ci_ledger.jsonl
