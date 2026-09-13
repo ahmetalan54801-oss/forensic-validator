@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ahmetalan54801-oss.github.io/forensic-validator/sitemap.xml
