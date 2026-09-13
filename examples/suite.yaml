@@ -1,0 +1,28 @@
+suite: "cp aracı bütünlük testi (örnek)"
+cases:
+  - name: "cp komutu dosyayı bit-bit kopyalar"
+    vars:
+      input: "sample_input.bin"
+      output: "sample_output.bin"
+    command: "cp {input} {output}"
+    expect:
+      exit_code: 0
+      files_match:
+        a: "{input}"
+        b: "{output}"
+        algo: sha256
+
+  - name: "cat komutu stdout'a çıktı basar"
+    vars:
+      input: "sample_input.bin"
+    command: "cat {input}"
+    expect:
+      exit_code: 0
+
+  - name: "kasıtlı başarısız test: olmayan dosya"
+    vars:
+      missing: "does_not_exist.bin"
+    command: "cat {missing}"
+    expect:
+      exit_code: 1
+      stderr_contains: "No such file"

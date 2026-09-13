@@ -1,0 +1,74 @@
+suite: "dc3dd adli imaging aracı doğrulama testi"
+cases:
+  - name: "dc3dd bit-bit imaj alırken kaynak dosyayla aynı hash'i üretir"
+    vars:
+      input: "sample_input.bin"
+      output: "dc3dd_output.img"
+      hashlog: "dc3dd_hash.log"
+    command: "dc3dd if={input} of={output} hash=sha256 log={hashlog}"
+    expect:
+      exit_code: 0
+      files_match:
+        a: "{input}"
+        b: "{output}"
+        algo: sha256
+
+  - name: "dc3dd üretilen hash log'unda sha256 değeri yer alır"
+    vars:
+      input: "sample_input.bin"
+      output: "dc3dd_output2.img"
+      hashlog: "dc3dd_hash2.log"
+    command: "dc3dd if={input} of={output} hash=sha256 log={hashlog}"
+    expect:
+      exit_code: 0
+      file_hash:
+        path: "{output}"
+        algo: sha256
+        expected: "032e4cffad3bd626471e4aa19f6b94091dcc3d9dbddfa85a6a6d15d57e0b5bdf"
+
+  - name: "dc3dd hatalı girdi dosyasında hata verir"
+    vars:
+      missing: "does_not_exist.bin"
+      output: "should_not_exist.img"
+    command: "dc3dd if={missing} of={output}"
+    expect:
+      exit_code: 1
+
+  - name: "dc3dd count parametresiyle sadece istenen kadar veriyi kopyalar"
+    vars:
+      input: "sample_input.bin"
+      output: "dc3dd_partial_head.img"
+      hashlog: "dc3dd_hash_head.log"
+    command: "dc3dd if={input} of={output} bs=1 count=512 hash=sha256 log={hashlog}"
+    expect:
+      exit_code: 0
+      files_match:
+        a: "sample_input_first512.bin"
+        b: "{output}"
+        algo: sha256
+
+  - name: "dc3dd skip parametresiyle doğru offsetten veriyi okur"
+    vars:
+      input: "sample_input.bin"
+      output: "dc3dd_partial_mid.img"
+      hashlog: "dc3dd_hash_mid.log"
+    command: "dc3dd if={input} of={output} bs=1 skip=1000 count=512 hash=sha256 log={hashlog}"
+    expect:
+      exit_code: 0
+      files_match:
+        a: "sample_input_mid512.bin"
+        b: "{output}"
+        algo: sha256
+
+  - name: "farklı blok boyutu (bs=1) yine de bit-bit doğru kopya üretir"
+    vars:
+      input: "sample_input.bin"
+      output: "dc3dd_output_bs1.img"
+      hashlog: "dc3dd_hash_bs1.log"
+    command: "dc3dd if={input} of={output} bs=1 hash=sha256 log={hashlog}"
+    expect:
+      exit_code: 0
+      files_match:
+        a: "{input}"
+        b: "{output}"
+        algo: sha256
