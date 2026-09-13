@@ -97,3 +97,7 @@ hash zincirini yeniden hesaplayarak kontrol eder.
 Bu bir öğrenme projesidir; gerçek adli vaka süreçlerinde kullanılacak
 yazılımlar için NIST CFTT test metodolojisi, ilgili mevzuat ve kurumunuzun
 akreditasyon gereksinimleri (ör. ISO/IEC 17025) esas alınmalıdır.
+
+## Lisans
+
+MIT — bkz. [LICENSE](LICENSE).
