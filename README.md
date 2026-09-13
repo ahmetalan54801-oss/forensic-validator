@@ -1,5 +1,10 @@
 # forensic-validator
 
+![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)
+![Python](https://img.shields.io/badge/python-3.11%2B-blue.svg)
+![dd suite](https://img.shields.io/badge/dd%20suite-6%2F6%20passing-brightgreen.svg)
+![dc3dd suite](https://img.shields.io/badge/dc3dd%20suite-6%2F6%20passing-brightgreen.svg)
+
 Adli bilişim araç ve yöntemlerini doğrulamak için basit bir CLI aracı (öğrenme projesi).
 
 Üç modül içerir:
@@ -10,6 +15,26 @@ Adli bilişim araç ve yöntemlerini doğrulamak için basit bir CLI aracı (ö�
    beklenen sonuçla karşılaştıran test çerçevesi
 3. **ledger** — zincir-i emanet (chain-of-custody) defteri; her kayıt bir öncekinin
    hash'ini içerir, böylece sonradan yapılan değişiklikler `verify` ile tespit edilir
+
+## Mimari
+
+```mermaid
+flowchart LR
+    CLI["forensic-validator CLI"]
+
+    CLI --> HASH["hash\ncompute / compare / verify"]
+    CLI --> TEST["testsuite\nrun"]
+    CLI --> LEDGER["ledger\nadd / show / verify"]
+
+    TOOL["Doğrulanan adli araç\n(dd, dc3dd, ...)"] --> TEST
+    TEST -- "--ledger" --> LEDGER
+    HASH -.-> TEST
+    LEDGER --> CHAIN[("hash zinciri\n(jsonl, append-only)")]
+```
+
+`testsuite`, doğrulanan aracı (dd, dc3dd vb.) YAML'da tanımlı senaryolarla
+çalıştırır; `hash` modülünü kullanarak sonucu doğrular ve `--ledger` verilirse
+sonucu kurcalamaya karşı korumalı deftere yazar.
 
 ## Kurulum
 
@@ -91,6 +116,34 @@ forensic-validator ledger verify --file case001.jsonl
 
 `verify`, defterdeki herhangi bir kaydın sonradan değiştirilip değiştirilmediğini
 hash zincirini yeniden hesaplayarak kontrol eder.
+
+## Örnek çıktı
+
+```
+$ forensic-validator testsuite run examples/dc3dd_suite.yaml
+
+# Test Raporu: examples/dc3dd_suite.yaml
+
+**Sonuç: 6/6 test başarılı**
+
+## [PASS] dc3dd bit-bit imaj alırken kaynak dosyayla aynı hash'i üretir
+- exit_code: 0
+
+## [PASS] dc3dd üretilen hash log'unda sha256 değeri yer alır
+- exit_code: 0
+
+## [PASS] dc3dd hatalı girdi dosyasında hata verir
+- exit_code: 1
+
+## [PASS] dc3dd cnt parametresiyle sadece istenen kadar veriyi kopyalar
+- exit_code: 0
+
+## [PASS] dc3dd iskip parametresiyle doğru offsetten veriyi okur
+- exit_code: 0
+
+## [PASS] farklı tampon boyutu (bufsz=512) yine de bit-bit doğru kopya üretir
+- exit_code: 0
+```
 
 ## Sınırlamalar
 
